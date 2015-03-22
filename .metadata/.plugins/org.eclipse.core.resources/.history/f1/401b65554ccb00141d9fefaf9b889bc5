@@ -1,0 +1,10 @@
+
+
+
+
+uint32_t adc_sequencer [8] ;
+
+
+
+
+void adm_configuration(void);

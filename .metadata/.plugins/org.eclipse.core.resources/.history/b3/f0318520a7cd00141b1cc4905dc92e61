@@ -1,0 +1,104 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include "tm4c123gh6pm.h"
+#include <../../../bsw/srv/nokia/PCD8544.h>
+#include <../../../bsw/srv/nokia/PCD8544_api.h>
+
+
+
+void main(void) {
+
+WDTCTL = WDTPW + WDTHOLD; // disable WDT
+BCSCTL1 = CALBC1_1MHZ; // 1MHz clock
+DCOCTL = CALDCO_1MHZ;
+
+P1OUT |= LCD5110_SCE_PIN + LCD5110_DC_PIN;
+P1DIR |= LCD5110_SCE_PIN + LCD5110_DC_PIN;
+
+// setup USIB
+P1SEL |= LCD5110_SCLK_PIN + LCD5110_DN_PIN;
+P1SEL2 |= LCD5110_SCLK_PIN + LCD5110_DN_PIN;
+
+UCB0CTL0 |= UCCKPH + UCMSB + UCMST + UCSYNC; // 3-pin, 8-bit SPI master
+UCB0CTL1 |= UCSSEL_2; // SMCLK
+UCB0BR0 |= 0x01; // 1:1
+UCB0BR1 = 0;
+UCB0CTL1 &= ~UCSWRST; // clear SW
+
+_delay_cycles(500000);
+initLCD();
+clearLCD();
+
+// LCD test
+writeStringToLCD("Nokia 5110");
+
+_delay_cycles(2000000);
+setAddr(0, 0);
+
+int c = 0x20;
+while(c < (65 + 0x20)) {
+writeCharToLCD(c);
+c++;
+}
+
+_delay_cycles(2000000);
+clearLCD();
+
+c = 65 + 0x20;
+
+while(c < (96 + 0x20)) {
+writeCharToLCD(c);
+c++;
+}
+
+_delay_cycles(2000000);
+
+c = 0;
+clearBank(3);
+while(c < 64) {
+writeToLCD(LCD5110_DATA, 0xFF);
+c++;
+_delay_cycles(20000);
+}
+clearBank(4);
+while(c < 100) {
+writeToLCD(LCD5110_DATA, 0xFF);
+c++;
+_delay_cycles(20000);
+}
+clearBank(5);
+while(c < 184) {
+writeToLCD(LCD5110_DATA, 0xFF);
+c++;
+_delay_cycles(20000);
+}
+
+_delay_cycles(2000000);
+
+clearBank(3);
+writeGraphicToLCD(testBlock, NONE);
+writeGraphicToLCD(testBlock, FLIP_V);
+writeGraphicToLCD(testBlock, FLIP_H);
+writeGraphicToLCD(testBlock, ROTATE);
+writeGraphicToLCD(testBlock, FLIP_V | ROTATE);
+writeGraphicToLCD(testBlock, FLIP_H | ROTATE);
+writeGraphicToLCD(testBlock, ROTATE_90_CCW);
+writeGraphicToLCD(testBlock, ROTATE_180);
+
+clearBank(4);
+writeGraphicToLCD(testBlock2, NONE);
+writeGraphicToLCD(testBlock2, FLIP_H);
+writeGraphicToLCD(testBlock2, ROTATE);
+writeGraphicToLCD(testBlock2, ROTATE_90_CCW);
+
+
+
+clearBank(0);
+writeStringToLCD("For details,");
+clearBank(1);
+writeStringToLCD("visit 43oh.com");
+clearBank(2);
+}

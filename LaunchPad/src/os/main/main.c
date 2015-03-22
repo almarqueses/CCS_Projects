@@ -1,0 +1,144 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include "hw_memmap.h"
+#include "sysctl.h"
+#include "gpio.h"
+#include <../../../bsw/mcal/cfg/pin.h>
+#include <../../../bsw/mcal/driverlib/adc.h>
+#include <../../../bsw/srv/lcd/lcd.h>
+#include <../../../bsw/srv/pll/pll.h>
+#include <../../../bsw/srv/systick/systick.h>
+#include <../../../bsw/srv/adm/adm.h>
+
+#define rgb_port		GPIO_PORTF_BASE
+#define rgb_led_red		GPIO_PIN_1
+#define rgb_led_blue	GPIO_PIN_2
+#define rgb_led_green	GPIO_PIN_3
+#define sw_port			GPIO_PORTF_BASE
+#define sw_left			GPIO_PIN_4
+#define sw_right		GPIO_PIN_0
+
+
+void _itoa(unsigned int uiNum, unsigned char *buf, unsigned char uiRadix);
+char *ftoa(char *a, double f, int precision);
+
+unsigned long cpu_freq;
+
+ int main (void){
+
+	uint32_t switch_counter = 0;
+    uint32_t ui32TempValueC;
+	uint32_t pui32ADC0Value[1];
+	float	temp;
+	char c[20];
+	SysCtlClockSet(SYSCTL_SYSDIV_4 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
+	//pll_init();
+	systick_init();
+	//set_cpu_freq(3,1);         // 50 MHz
+	cpu_freq = get_cpu_freq();
+	PortFunctionInit();
+	lcd_init();
+	adm_configuration();
+
+	  delay_ms(1000);
+	  lcd_puts("Alberto");
+	  lcd_goto(2,2);
+	  lcd_puts("Marqueses");
+	  delay_ms(1000);
+      lcd_clear();
+
+
+
+
+      while(1)
+    {
+		if(!GPIOPinRead(sw_port,sw_right)){
+
+        // Output low level
+			GPIOPinWrite(rgb_port, rgb_led_red,~rgb_led_red);
+			switch_counter++;
+		}
+		else{
+        // Output high level
+            GPIOPinWrite(rgb_port, rgb_led_red,rgb_led_red);
+
+		}
+
+		adm_getValue();
+		lcd_clear();
+
+		lcd_goto(2,1);
+		temp = (147.5 - (75*3.3*adc_sequencer[0]) / 4095);
+		ftoa(c, temp, 10);
+		lcd_puts(c);
+		lcd_goto(1,1);
+		sprintf(c, "%u", adc_sequencer[1]);
+		lcd_puts(c);
+		lcd_goto(1,7);
+		sprintf(c, "%u", adc_sequencer[2]);
+		lcd_puts(c);
+		delay_ms(250);
+    }
+
+
+return (0);
+}
+
+
+
+/*!
+ *  ======== _itoa ========
+ *
+ *  @brief  Function that converts a 16 bit number to ASCII
+ *
+ *  @param  uiNum    The value to be converted to a string.
+ *
+ *  @param  buf      Pointer to memory where to store the resulting null-terminated string.
+ *
+ *  @param  uiRadix  Numerical base used to represent the value as a string, between 2 and 36,
+ *                   where 10 means decimal base, 16 hexadecimal, 8 octal, and 2 binary.
+ *
+ * @return  void
+ *
+ *********************************************************************/
+void itoa(unsigned int uiNum, unsigned char *buf, unsigned char uiRadix)
+{
+    unsigned char c, i;
+    unsigned char *p, rst[32];
+
+    p = rst;
+    for (i = 0; i < 32; i++, p++)
+    {
+        /* Isolate a digit */
+        c = uiNum % uiRadix;
+        /* Convert to Ascii */
+        *p = c + ((c < 10) ? '0' : '7');
+        uiNum /= uiRadix;
+        if (!uiNum)
+            break;
+    }
+
+    for (c = 0; c <= i; c++)
+    {
+        /* Reverse character order */
+        *buf++ = *p--;
+    }
+    *buf = '\0';
+}
+
+char *ftoa(char *a, double f, int precision)
+{
+ long p[] = {0,10,100,1000,10000,100000,1000000,10000000,100000000};
+
+ char *ret = a;
+ long heiltal = (long)f;
+ itoa(heiltal, a, 10);
+ while (*a != '\0') a++;
+ *a++ = '.';
+ long desimal = abs((long)((f - heiltal) * p[precision]));
+ itoa(desimal, a, 10);
+ return ret;
+}

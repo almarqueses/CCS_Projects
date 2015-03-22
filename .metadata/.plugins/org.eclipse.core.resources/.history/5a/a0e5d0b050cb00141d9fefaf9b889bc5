@@ -1,0 +1,49 @@
+//#include <stdint.h>
+//#include <stdbool.h>
+#include "hw_types.h"
+#include "hw_memmap.h"
+#include "hw_ints.h"
+#include "timer.h"
+#include "gpio.h"
+#include "interrupt.h"
+#include "adm.h"
+#include "sysctl.h"
+#include "adc.h"
+
+
+void adm_configuration(void)
+{
+    //
+    // Enable the first sample sequencer to capture the value of channel 0 when
+    // the processor trigger occurs.
+    //
+	ADCSequenceDisable(ADC0_BASE, 0);
+    ADCSequenceConfigure(ADC0_BASE, 0, ADC_TRIGGER_PROCESSOR, 0);
+    ADCSequenceStepConfigure(ADC0_BASE, 0, 0, ADC_CTL_IE | ADC_CTL_TS);
+    ADCSequenceStepConfigure(ADC0_BASE, 0, 1, ADC_CTL_IE | ADC_CTL_CH0);
+    ADCSequenceStepConfigure(ADC0_BASE, 0, 2, ADC_CTL_IE | ADC_CTL_END | ADC_CTL_CH1);
+    ADCSequenceEnable(ADC0_BASE, 0);
+    ADCIntClear(ADC0_BASE, 0);
+    ADCIntEnable(ADC0_BASE, 0);
+    //
+    // Trigger the sample sequence.
+    //
+    //ADCProcessorTrigger(ADC0_BASE, 0);
+
+
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER1);
+    TimerConfigure(TIMER1_BASE, TIMER_CFG_A_PERIODIC | TIMER_CFG_B_PERIODIC);
+    TimerLoadSet(TIMER1_BASE, TIMER_A, 50000);
+    TimerControlStall(TIMER1_BASE, TIMER_A, true);
+    TimerControlTrigger(TIMER1_BASE, TIMER_A, true);
+    TimerEnable(TIMER1_BASE, TIMER_A);
+
+	IntEnable(INT_ADC0SS0);
+	IntMasterEnable();
+}
+
+
+void ISRHandler (void){
+	ADCSequenceDataGet(ADC0_BASE, 0, adc_sequencer);
+	ADCIntClear(ADC0_BASE, 0);
+}

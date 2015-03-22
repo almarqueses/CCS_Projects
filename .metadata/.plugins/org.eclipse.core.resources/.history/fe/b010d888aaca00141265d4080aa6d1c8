@@ -1,0 +1,76 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include "hw_memmap.h"
+//#include "inc/hw_types.h"
+//#include "inc/hw_gpio.h"
+#include "sysctl.h"
+#include "gpio.h"
+#include <../../../bsw/mcal/cfg/pin.h>
+#include <../../../bsw/srv/lcd/lcd.h>
+#include <../../../bsw/srv/pll/pll.h>
+#include <../../../bsw/srv/systick/systick.h>
+
+#define rgb_port		GPIO_PORTF_BASE
+#define rgb_led_red		GPIO_PIN_1
+#define rgb_led_blue	GPIO_PIN_2
+#define rgb_led_green	GPIO_PIN_3
+#define sw_port			GPIO_PORTF_BASE
+#define sw_left			GPIO_PIN_4
+#define sw_right		GPIO_PIN_0
+
+typedef enum
+{ Bit_RESET = 0,
+  Bit_SET
+}BitAction;
+
+unsigned long cpu_freq;
+
+int main (void){
+	int n = 782 ;
+	unsigned char ch=0;
+	char c[20];
+	pll_init();
+	systick_init();
+
+	  set_cpu_freq(3,1);         // 50 MHz
+	  cpu_freq = get_cpu_freq();
+
+	  lcd_init();
+	  delay_ms(1000);
+
+	  lcd_puts("Alberto");
+	  lcd_goto(2,2);
+	  lcd_puts("Marqueses");
+	  PortFunctionInit();
+
+		SysCtlDelay(4000000);
+		lcd_clear();
+	  while(1)
+    {
+		if(!GPIOPinRead (sw_port,sw_right)){
+
+        // Output high level
+			GPIOPinWrite(rgb_port, rgb_led_red,~rgb_led_red);
+		}
+		else{
+        // Output low level
+            GPIOPinWrite(rgb_port, rgb_led_red,rgb_led_red);
+		}
+
+		SysCtlDelay(1000000);
+
+		lcd_goto(1,1);
+		lcd_puts("Works!");
+		lcd_goto(2,1);
+		n++;
+		sprintf(c, "%d", n);
+		lcd_puts(c);
+
+    }
+
+
+return (0);
+}

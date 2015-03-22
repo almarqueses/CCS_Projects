@@ -1,0 +1,30 @@
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
+# Add inputs and outputs from these tool invocations to the build variables 
+C_SRCS += \
+../src/bsw/srv/nokia/PCD8544.c \
+../src/bsw/srv/nokia/main.c 
+
+OBJS += \
+./src/bsw/srv/nokia/PCD8544.obj \
+./src/bsw/srv/nokia/main.obj 
+
+C_DEPS += \
+./src/bsw/srv/nokia/PCD8544.pp \
+./src/bsw/srv/nokia/main.pp 
+
+C_DEPS__QUOTED += \
+"src\bsw\srv\nokia\PCD8544.pp" \
+"src\bsw\srv\nokia\main.pp" 
+
+OBJS__QUOTED += \
+"src\bsw\srv\nokia\PCD8544.obj" \
+"src\bsw\srv\nokia\main.obj" 
+
+C_SRCS__QUOTED += \
+"../src/bsw/srv/nokia/PCD8544.c" \
+"../src/bsw/srv/nokia/main.c" 
+
+

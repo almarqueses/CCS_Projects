@@ -1,0 +1,17 @@
+eclipse.preferences.version=1
+encoding//Debug/sources.mk=UTF-8
+encoding//Debug/src/bsw/mcal/cfg/subdir_vars.mk=UTF-8
+encoding//Debug/src/bsw/mcal/driverlib/subdir_rules.mk=UTF-8
+encoding//Debug/src/bsw/mcal/driverlib/subdir_vars.mk=UTF-8
+encoding//Debug/src/bsw/srv/adm/subdir_rules.mk=UTF-8
+encoding//Debug/src/bsw/srv/adm/subdir_vars.mk=UTF-8
+encoding//Debug/src/bsw/srv/lcd/subdir_rules.mk=UTF-8
+encoding//Debug/src/bsw/srv/lcd/subdir_vars.mk=UTF-8
+encoding//Debug/src/bsw/srv/pll/subdir_rules.mk=UTF-8
+encoding//Debug/src/bsw/srv/pll/subdir_vars.mk=UTF-8
+encoding//Debug/src/bsw/srv/systick/subdir_rules.mk=UTF-8
+encoding//Debug/src/bsw/srv/systick/subdir_vars.mk=UTF-8
+encoding//Debug/src/os/main/subdir_rules.mk=UTF-8
+encoding//Debug/src/os/main/subdir_vars.mk=UTF-8
+encoding//Debug/subdir_rules.mk=UTF-8
+encoding//Debug/subdir_vars.mk=UTF-8
